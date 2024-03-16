@@ -1,0 +1,25 @@
+services:
+  mosquitto:
+    image: eclipse-mosquitto
+    restart: unless-stopped
+    ports:
+      - "8883:8883"
+      - "9001:9001"
+    volumes:
+      - ./mosquitto.conf:/mosquitto/config/mosquitto.conf
+      - ./mqtt_password.txt:/mosquitto/config/password.txt
+
+  db:
+    image: mariadb
+    restart: always
+    ports:
+      - "3306:3306"
+    environment:
+      MARIADB_ROOT_PASSWORD: root
+      MARIADB_USER: user
+      MARIADB_PASSWORD: user
+      MARIADB_DATABASE: sensor_fetcher
+
+networks:
+  host:
+    external: true

@@ -51,16 +51,21 @@ class MqttConnector:
     # The callback for when a PUBLISH message is received from the server.
     def __on_message(self, client, userdata, msg):
         self.logger.debug(f"Received message: {msg.topic} {str(msg.payload)}")
-        payload = json.loads(msg.payload.decode("utf-8"))
-        if "object" in payload:
-            obj = payload["object"]
-            self.db_manager.add_entry(
-                payload["deviceName"],
-                obj.get("battery"),
-                obj.get("light"),
-                obj.get("pressure"),
-                obj.get("temperature"),
-            )
+        try:
+            payload = json.loads(msg.payload.decode("utf-8"))
+            if "object" in payload:
+                obj = payload["object"]
+                self.db_manager.add_entry(
+                    payload["deviceName"],
+                    obj.get("battery"),
+                    obj.get("light"),
+                    obj.get("pressure"),
+                    obj.get("temperature"),
+                )
+            else:
+                self.logger.debug("Payload does not contain required data.")
+        except Exception as e:
+            self.logger.error(f"Error processing message: {e}")
 
     def start_fetching(self):
         self.logger.info("Starting MQTT message fetching...")

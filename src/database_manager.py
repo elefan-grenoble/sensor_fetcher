@@ -59,10 +59,10 @@ class DatabaseManager:
 
     def add_entry(self, device_name, battery, light, pressure, temperature):
         if (
-            battery == None
-            and light == None
-            and pressure == None
-            and temperature == None
+            battery is None
+            and light is None
+            and pressure is None
+            and temperature is None
         ):
             self.logger.debug(
                 f"Empty data for sensor {device_name}. SKipping..."

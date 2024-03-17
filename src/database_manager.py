@@ -58,6 +58,16 @@ class DatabaseManager:
             sys.exit(1)
 
     def add_entry(self, device_name, battery, light, pressure, temperature):
+        if (
+            battery == None
+            and light == None
+            and pressure == None
+            and temperature == None
+        ):
+            self.logger.debug(
+                f"Empty data for sensor {device_name}. SKipping..."
+            )
+            return
         try:
             # Create a session
             session = self.Session()

@@ -19,6 +19,9 @@ class MqttConnector:
         self.mqtt_password = os.environ.get("MQTT_PASSWORD")
         self.mqtt_host = os.environ.get("MQTT_HOST")
         self.mqtt_port = int(os.environ.get("MQTT_PORT", 1883))
+        self.mqtt_topics = os.getenv("MQTT_TOPICS")
+        if not self.mqtt_topics:
+            raise ValueError("MQTT_TOPICS not defined in .env file")
 
         self.client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION1)
         self.client.on_connect = self.__on_connect
@@ -40,8 +43,11 @@ class MqttConnector:
     # The callback for when the client receives a CONNACK response.
     def __on_connect(self, client, userdata, flags, reason_code):
         if reason_code == 0:
-            client.subscribe("application/490/device/+/rx")
-            self.logger.info("Subscribed topics")
+            # Subscribe to multiple topics specified in MQTT_TOPICS
+            topics = self.mqtt_topics.split(',')
+            for topic in topics:
+                client.subscribe(topic.strip())
+            self.logger.info("Subscribed to topics: %s", topics)
         else:
             self.logger.error(
                 "Failed to connect to MQTT broker with reason code "
